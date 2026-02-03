@@ -1,0 +1,22 @@
+# CLion / JetBrains
+.idea/
+*.iml
+
+# CMake build folders
+cmake-build-*/
+build/
+out/
+
+# Compiled files
+*.o
+*.obj
+*.exe
+*.dll
+*.a
+*.lib
+*.so
+*.dylib
+
+# OS files
+.DS_Store
+Thumbs.db
