@@ -1,69 +1,120 @@
 # Progetto Note Manager
 
-Progetto sviluppato in **C++** per il corso di **Laboratorio di Programmazione**.
+Questo progetto implementa un sistema di gestione delle note in **C++**, sviluppato per il corso di **Laboratorio di Programmazione**.
 
-L’obiettivo del progetto è realizzare un **gestore di note** da linea di comando (CLI), che consenta di creare, modificare e organizzare note testuali, applicando correttamente i principi di programmazione ad oggetti e il **pattern Observer**.
-
----
-
-## 📝 Descrizione generale
-
-Il sistema permette di gestire una collezione di note, ognuna caratterizzata da:
-- un identificativo univoco
-- un titolo
-- un testo
-- uno stato di blocco
-- uno stato di preferito
-
-Le note sono gestite all’interno di un contenitore (`Folder`) che fornisce tutte le operazioni principali.
-
-Il progetto è strutturato in modo modulare e separa:
-- **logica applicativa**
-- **interfaccia utente**
-- **test**
+L’applicazione consente di creare, modificare e organizzare note testuali all’interno di una collezione, utilizzando il **pattern Observer** per notificare automaticamente i cambiamenti di stato.
 
 ---
 
-## 🧩 Pattern Observer
+## 1. Classe Note
 
-Il progetto utilizza il **pattern Observer** per notificare automaticamente i cambiamenti di stato del contenitore di note.
+La classe `Note` rappresenta una singola nota.
 
-- `Subject` definisce l’interfaccia del soggetto osservabile
-- `Observer` definisce l’interfaccia degli osservatori
-- `Folder` implementa `Subject`
-- `ConcreteObserver` implementa `Observer`
+### Attributi
+- `int id` : identificativo univoco della nota
+- `std::string title` : titolo della nota
+- `std::string text` : contenuto della nota
+- `bool locked` : indica se la nota è bloccata
+- `bool favorite` : indica se la nota è contrassegnata come preferita
 
-Ogni volta che viene aggiunta o rimossa una nota, il `Folder` notifica gli osservatori registrati.
+### Metodi principali
+- Costruttore: inizializza identificativo, titolo e contenuto
+- `lock()` / `unlock()` : blocca o sblocca la nota
+- `setTitle()` / `setText()` : modifica titolo o contenuto (se non bloccata)
+- `setFavorite()` : imposta lo stato di preferito
+- Metodi getter per accedere agli attributi
 
-Questo approccio permette di mantenere **disaccoppiata** la logica di gestione delle note dalle azioni eseguite in risposta ai cambiamenti.
+### Test
+La classe `Note` è testata tramite **test unitari** per verificare:
+- la corretta creazione della nota
+- il comportamento in caso di blocco
+- la modifica degli attributi
 
 ---
 
-## 📂 Struttura del progetto
----Elaborato_Corti/ ├── src/ │   ├── main.cpp │   ├── folder.h │   ├── folder.cpp │   ├── note.h │   ├── note.cpp │   ├── Observer.h │   ├── Subject.h │   ├── ConcreteObserver.h │   └── ConcreteObserver.cpp ├── tst/ │   ├── test_note.cpp │   └── test_folder.cpp ├── CMakeLists.txt └── README.md
-## ⚙️ Compilazione e build
+## 2. Classe Folder
 
-### Requisiti
-- Compilatore C++ compatibile con **C++20**
-- **CMake ≥ 3.16**
-- CLion (consigliato)
+La classe `Folder` gestisce un insieme di note e fornisce le operazioni principali.
 
-### Build con CLion
-1. Aprire la cartella del progetto
-2. Attendere il caricamento di CMake
-3. Selezionare il target `Elaborato_Corti`
-4. Avviare l’esecuzione
+### Gestione delle note
+- `int addNote(const std::string&, const std::string&)`  
+  Aggiunge una nuova nota e restituisce il suo identificativo
+- `bool removeNote(int id)`  
+  Rimuove una nota dato l’identificativo
+- `std::optional<Note> getCopy(int id) const`  
+  Restituisce una copia della nota
+- `Note* getMutable(int id)`  
+  Restituisce un puntatore alla nota modificabile
+- `const std::vector<Note>& all() const`  
+  Restituisce l’elenco completo delle note
 
-### 🖥️ Utilizzo dell’applicazione
+### Modifica e ricerca
+- `search(const std::string&)`  
+  Ricerca le note contenenti una parola chiave nel titolo o nel testo
+- `favorites()`  
+  Restituisce l’elenco delle note preferite
+- `locked()`  
+  Restituisce l’elenco delle note bloccate
 
-All’avvio viene mostrato un menu testuale che consente di:   
--aggiungere una nota  
--visualizzare l’elenco delle note                    
--visualizzare una singola nota   
--modificare titolo o contenuto  
--eliminare una nota     
--bloccare / sbloccare una nota
--aggiungere / rimuovere una nota dai preferiti   
--cercare note tramite parola chiave
--visualizzare le note preferite  
-Le note bloccate non possono essere modificate.
+### Test
+La classe `Folder` è testata per verificare:
+- aggiunta e rimozione delle note
+- corretto funzionamento della ricerca
+
+---
+
+## 3. Pattern Observer
+
+Il **pattern Observer** è utilizzato per notificare automaticamente i cambiamenti nello stato del `Folder`.
+
+### Classe Subject
+Interfaccia astratta che definisce:
+- `addObserver(Observer*)`
+- `removeObserver(Observer*)`
+- `notifyObservers()`
+
+La classe `Folder` implementa questa interfaccia.
+
+---
+
+### Classe Observer
+Interfaccia astratta che definisce:
+- `update(const Folder&)`
+
+Viene chiamata ogni volta che il `Subject` notifica un cambiamento.
+
+---
+
+### Classe ConcreteObserver
+Implementazione concreta dell’Observer.
+
+- Monitora il numero di note presenti in un `Folder`
+- Stampa un messaggio ogni volta che una nota viene aggiunta o rimossa
+- Può essere registrato o rimosso dinamicamente dal `Folder`
+
+---
+
+## 4. Interfaccia utente (CLI)
+
+L’interazione con l’utente avviene tramite un **menu testuale** che consente di:
+- aggiungere note
+- visualizzare e modificare note
+- bloccare o sbloccare note
+- gestire i preferiti
+- effettuare ricerche
+
+La logica applicativa è separata dall’interfaccia utente.
+
+---
+
+## 5. Test
+
+Il progetto include test unitari realizzati con **GoogleTest**, situati nella cartella `tst/`.
+
+I test verificano il corretto comportamento delle classi principali (`Note` e `Folder`) in modo automatico.
+
+---
+
+## Autore
+
+Elaborato realizzato da Giulio Corti
