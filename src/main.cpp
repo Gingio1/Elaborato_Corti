@@ -5,8 +5,8 @@
 
 static void printNoteShort(const Note& n) {
     std::cout << "[" << n.id() << "] " << n.title();
-    if (n.favorite()) std::cout << " ★";
-    if (n.locked()) std::cout << " 🔒";
+    if (n.favorite()) std::cout << " [FAV]";
+    if (n.locked()) std::cout << " [LOCKED]";
     std::cout << "\n";
 }
 
